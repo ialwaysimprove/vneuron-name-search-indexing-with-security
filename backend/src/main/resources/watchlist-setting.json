@@ -1,0 +1,170 @@
+{
+  "index": {
+    "analysis": {
+      "analyzer": {
+        "fuzzy_matching": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "icu_normalizer",
+            "icu_folding",
+            "unique"
+          ]
+        },
+        "fuzzy_matching_with_shingles": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "my_shingle",
+            "icu_normalizer",
+            "icu_folding",
+            "unique"
+          ]
+        },
+        "transliterate_metaphone": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "icu_transliterate",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "transliterate_metaphone_with_shingles": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "my_shingle",
+            "icu_transliterate",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "double_metaphone": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "my_shingle",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "double_metaphone_with_shingles": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "my_shingle",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "transliterate_bider_morse": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "icu_transliterate",
+            "lowercase",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "transliterate_bider_morse_with_shingles": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "my_shingle",
+            "icu_transliterate",
+            "lowercase",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "bider_morse": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "lowercase",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "bider_morse_with_shingles": {
+          "type": "custom",
+          "tokenizer": "nfd_normalized",
+          "filter": [
+            "my_shingle",
+            "lowercase",
+            "phonetic_double_metaphone",
+            "unique"
+          ]
+        },
+        "ngram_truncate": {
+          "type": "custom",
+          "char_filter": [
+            "nfd_normalizer"
+          ],
+          "tokenizer": "ngram_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      },
+      "char_filter": {
+        "nfd_normalizer": {
+          "type": "icu_normalizer",
+          "mode": "decompose",
+          "name": "nfc"
+        }
+      },
+      "tokenizer": {
+        "fuzzy_tokenizer": { "type": "icu_tokenizer" },
+        "nfd_normalized": {
+          "type": "icu_tokenizer",
+          "tokenizer": "icu_tokenizer",
+          "char_filter": [
+            "nfd_normalizer"
+          ]
+        },
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 2,
+          "max_gram": 3,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      },
+      "filter": {
+        "icu_transliterate": {
+          "type": "icu_transform",
+          "id": "Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC"
+        },
+        "phonetic_double_metaphone": {
+          "type": "phonetic",
+          "encoder": "double_metaphone",
+          "replace": true
+        },
+        "phonetic_beider_morse" : {
+          "type" : "phonetic",
+          "encoder" : "beider_morse",
+          "replace": true,
+          "rule_type": "approx"
+        },
+        "my_shingle": {
+          "type": "shingle",
+          "max_shingle_size": 4,
+          "min_shingle_size": 2,
+          "output_unigrams": "true",
+          "token_separator": ""
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: active
+  security:
+    ignored: "/actuator/**"
+
+server:
+  port: 9000
+
+keycloak:
+  jwk: ${keycloak.url}/auth/realms/${keycloak.realm}/protocol/openid-connect/certs
+  url: http://keycloak:8080
+  realm: test
+
+logging:
+  level:
+    org:
+      springframework:
+        security: INFO
+      zalando:
+        logbook: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

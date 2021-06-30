@@ -1,0 +1,10 @@
+<nb-card  *ngIf="wholeName.trim() !== ''">
+    <nb-card-header>
+      Search Results for {{ wholeName }} | {{ matchesFound }} Matches Found
+    </nb-card-header>
+  
+    <nb-card-body>
+      <ng2-smart-table [settings]="settings" [source]="source">
+      </ng2-smart-table>
+    </nb-card-body>
+  </nb-card>

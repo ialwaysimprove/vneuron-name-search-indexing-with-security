@@ -1,0 +1,22 @@
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+
+
+@NgModule({
+  imports: [
+    CommonModule,
+    HttpClientModule,
+  ],
+  providers: [
+  ],
+})
+export class MockDataModule {
+  static forRoot(): ModuleWithProviders<MockDataModule> {
+    return {
+      ngModule: MockDataModule,
+      providers: [
+      ],
+    };
+  }
+}

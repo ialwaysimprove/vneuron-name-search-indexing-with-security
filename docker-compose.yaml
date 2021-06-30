@@ -1,0 +1,132 @@
+version: "3.8"
+
+services:
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - 80:80
+    environment:
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=test
+      - KEYCLOAK_CLIENT_ID=frontend
+      - BACKEND_BASE_PATH=http://backend:9000
+    depends_on:
+      - keycloak
+      - backend
+
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - 9000:9000
+    environment:
+      - APP_NAME=movies-app
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=test
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vneuron_clients
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - keycloak
+      - postgres
+      - es01
+      - kib01
+
+
+  keycloak:
+    image: jboss/keycloak:11.0.2
+    container_name: keycloak
+    ports:
+      - 8080:8080
+    environment:
+#      - KEYCLOAK_USER=admin
+#      - KEYCLOAK_PASSWORD=admin
+# only run on first run?
+      - DB_VENDOR=postgres
+      - DB_ADDR=postgres
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=keycloak
+      - KEYCLOAK_IMPORT=/tmp/realm-test.json
+    volumes:
+      - ./infra/keycloak/realm-test.json:/tmp/realm-test.json
+    command: ["-Dkeycloak.profile.feature.upload_scripts=enabled"]
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13.0-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d
+
+
+  prometheus:
+    image: prom/prometheus:v2.22.0
+    container_name: prometheus
+    ports:
+      - 5000:9090
+    volumes:
+      - prometheus:/prometheus
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:6.7.5
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - DS_PROMETHEUS=prometheus
+    volumes:
+      - ./infra/grafana/config.ini:/etc/grafana/config.ini
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+
+  es01:
+    build: ./infra/elasticsearch
+    container_name: es01
+    environment:
+      - node.name=es01
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    depends_on:
+      - postgres
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:7.11.2
+    container_name: kib01
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: '["http://es01:9200"]'
+    depends_on:
+      - es01
+
+volumes:
+  data01:
+    driver: local
+  postgres:
+  prometheus:

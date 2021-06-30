@@ -1,0 +1,17 @@
+<form class="form-inline" [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+    <input 
+        type="text" 
+        nbInput 
+        id="firstname"
+        formControlName="firstname"
+        fullWidth
+        >
+    <input 
+        type="text"
+        nbInput 
+        id="lastname"
+        formControlName="lastname"
+        fullWidth
+        >
+    <button type="submit" nbButton status="primary">Search</button>
+</form>
